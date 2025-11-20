@@ -1,24 +1,25 @@
 import { Module } from '@nestjs/common';
-import { createClient, SupabaseClient } from '@supabase/supabase-js';
-import { ConfigService } from '@nestjs/config';
+import { createClient } from '@supabase/supabase-js';
+import { ConfigService, ConfigModule } from '@nestjs/config';
 
 @Module({
+  imports: [ConfigModule],
   providers: [
     {
       provide: 'SUPABASE_CLIENT',
       inject: [ConfigService],
-      useFactory: (config: ConfigService): SupabaseClient => {
+      useFactory: (config: ConfigService) => {
         const url = config.get<string>('SUPABASE_URL');
         const key = config.get<string>('SUPABASE_KEY');
 
         if (!url || !key) {
-          throw new Error('Missing Supabase URL or KEY in environment variables');
+          throw new Error('Supabase URL or KEY missing');
         }
 
         return createClient(url, key);
-      },
-    },
+      }
+    }
   ],
   exports: ['SUPABASE_CLIENT'],
 })
-export class DatabaseModule {}
+export class SupabaseModule { }

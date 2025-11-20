@@ -1,16 +1,14 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
-import { FacturasService } from './facturas.service';
-import { CreateFacturaDto } from './dto/create-factura.dto';
-import { UpdateFacturaDto } from './dto/update-factura.dto';
+import { FacturasService } from '../service/facturas.service';
 
 @Controller('facturas')
 export class FacturasController {
   constructor(private readonly facturasService: FacturasService) {}
 
   @Post()
-  create(@Body() createFacturaDto: CreateFacturaDto) {
+  /*create(@Body() createFacturaDto: CreateFacturaDto) {
     return this.facturasService.create(createFacturaDto);
-  }
+  }*/
 
   @Get()
   findAll() {
@@ -23,9 +21,9 @@ export class FacturasController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateFacturaDto: UpdateFacturaDto) {
+  /*update(@Param('id') id: string, @Body() updateFacturaDto: UpdateFacturaDto) {
     return this.facturasService.update(+id, updateFacturaDto);
-  }
+  }*/
 
   @Delete(':id')
   remove(@Param('id') id: string) {
