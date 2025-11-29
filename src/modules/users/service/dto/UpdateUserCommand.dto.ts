@@ -1,4 +1,4 @@
-export class UpdateUserCommandDto {
+export default class UpdateUserCommandDto {
     private readonly name: string;
     private readonly role: string;
     private readonly password: string;

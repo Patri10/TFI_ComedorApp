@@ -2,8 +2,9 @@ import { Inject, Injectable } from '@nestjs/common';
 import { randomUUID } from 'crypto';
 import type { UserRepository } from '../domain/contract/user.repository';
 import CreateUserCommandDto from './dto/CreateUserCommand.dto';
-import { UpdateUserCommandDto } from './dto/UpdateUserCommand.dto';
+import UpdateUserCommandDto from './dto/UpdateUserCommand.dto';
 import User, { UserRole } from '../domain/model/user';
+import DeleteUserCommandDto from './dto/DeleteUserCommand.dto';
 
 @Injectable()
 export class UsersService {
@@ -38,5 +39,9 @@ export class UsersService {
       updateDto.getRole() as UserRole,
     );
     return this.usersRepository.updateUser(id, user);
+  }
+
+  async deleteUser( id: string, deleteDto: DeleteUserCommandDto){
+    return this.usersRepository.deleteUser(id, deleteDto);
   }
 }

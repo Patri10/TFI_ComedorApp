@@ -1,13 +1,16 @@
 import { IsString, IsNotEmpty, IsEmail } from "class-validator";
+import { Type } from "class-transformer";
 
 export default class CreateUserRequestDto {
     @IsString()
     @IsNotEmpty()
-    public readonly nombre: string;
+    @Type(() => String)
+    public readonly name: string;
 
     @IsString()
     @IsNotEmpty()
     @IsEmail()
+    @Type(() => String)
     public readonly email: string;
 
     @IsString()
@@ -16,6 +19,7 @@ export default class CreateUserRequestDto {
 
     @IsString()
     @IsNotEmpty()
+    @Type(() => String)
     public readonly rol: string;
 
     
