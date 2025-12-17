@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { DatabaseModule } from '../database/database.module';
 import { SupabaseComprasRepository } from './purchase/infrastructure/supabase.compras.repository';
-import { SupbasePurchaseDetailsRepository } from './purchase/infrastructure/supabase.purchase_details.repository';
+import { SupabasePurchaseDetailsRepository } from './purchase/infrastructure/supabase.purchase_details.repository';
 import { PurchaseService } from './purchase/service/purchase.service';
 // TODO: Uncomment when PurchaseController is implemented
 // import {PurchaseController} from './purchase/presentation/purchase.controller';
@@ -28,7 +28,7 @@ import { PurchaseService } from './purchase/service/purchase.service';
     },
     {
       provide: 'PurchaseDetailsRepository',
-      useClass: SupbasePurchaseDetailsRepository,
+      useClass: SupabasePurchaseDetailsRepository,
     },
     // TODO: Uncomment when SupplierRepository is implemented
     // {

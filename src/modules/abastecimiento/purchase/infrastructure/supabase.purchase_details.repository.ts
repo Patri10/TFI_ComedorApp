@@ -4,7 +4,7 @@ import type { PurchaseDetailsRepository } from '../domain/contract/purchase_deta
 import PurchaseDetail from '../domain/model/purchase_details';
 
 @Injectable()
-export class SupbasePurchaseDetailsRepository
+export class SupabasePurchaseDetailsRepository
   implements PurchaseDetailsRepository
 {
   constructor(
