@@ -21,7 +21,7 @@ export class RolesGuard implements CanActivate {
         let userRole = user.role;
 
         
-        if (!userRole || userRole === 'authenticated' || userRole === 'anon') {
+        if (!userRole || userRole === 'authenticated' || userRole === 'anon') {            
             console.log('Buscando rol real en DB para usuario:', user.userId);
             const { data, error } = await this.supabaseClient
                 .from('user_profiles')

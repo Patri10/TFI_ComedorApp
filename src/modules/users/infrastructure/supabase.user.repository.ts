@@ -132,7 +132,7 @@ export class SupabaseUserRepository implements UserRepository {
                 throw new Error("Usuario no actualizado: " + authError.message);
             }
         }
-    }
+    } 
 
     
 
