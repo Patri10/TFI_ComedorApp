@@ -1,23 +1,29 @@
-import { IsNotEmpty, IsString, IsDate, IsNumber, IsOptional } from "class-validator";
+import {
+  IsNotEmpty,
+  IsString,
+  IsDate,
+  IsNumber,
+  IsOptional,
+} from 'class-validator';
 
 export default class UpdatePurchaseRequestDto {
-    @IsOptional()
-    @IsString()
-    supplier_id: string;
+  @IsOptional()
+  @IsString()
+  supplier_id: string;
 
-    @IsOptional()
-    @IsString()
-    fund_id: string;
+  @IsOptional()
+  @IsString()
+  fund_id: string;
 
-    @IsOptional()
-    @IsDate()
-    date: Date;
+  @IsOptional()
+  @IsDate()
+  date: Date;
 
-    @IsOptional()
-    @IsNumber()
-    total_amount: number;
+  @IsOptional()
+  @IsNumber()
+  total_amount: number;
 
-    @IsOptional()
-    @IsString()
-    invoice_number: string;
+  @IsOptional()
+  @IsString()
+  invoice_number: string;
 }

@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { FondosService } from './fondos.service';
 import { CreateFondoDto } from './dto/create-fondo.dto';
 import { UpdateFondoDto } from './dto/update-fondo.dto';

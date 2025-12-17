@@ -1,6 +1,6 @@
-import { IsString } from "class-validator";
+import { IsString } from 'class-validator';
 
 export default class DeleteUserRequestDto {
-    @IsString()
-    public readonly id: string;
+  @IsString()
+  public readonly id: string;
 }

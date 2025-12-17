@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+} from '@nestjs/common';
 import { UsersService } from '../service/users.service';
 import CreateUserRequestDto from '../presentation/dto/CreateUserRequest.dto';
 import CreateUserCommandDto from '../service/dto/CreateUserCommand.dto';
@@ -11,10 +20,9 @@ import { RolesGuard } from '../../auth/roles.guard';
 import { Roles } from '../../auth/roles.decorator';
 import { UserRole } from '../domain/model/user';
 
-
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) { }
+  constructor(private readonly usersService: UsersService) {}
 
   @Get()
   @UseGuards(JwtAuthGuard, RolesGuard)
@@ -31,7 +39,7 @@ export class UsersController {
       createUserRequestDto.email,
       createUserRequestDto.password,
       createUserRequestDto.name,
-      createUserRequestDto.rol
+      createUserRequestDto.rol,
     );
     return this.usersService.createUser(command);
   }
@@ -39,12 +47,15 @@ export class UsersController {
   @Patch(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
-  updateUser(@Param('id') id: string, @Body() updateUserRequestDto: UpdateUserRequestDto) {
+  updateUser(
+    @Param('id') id: string,
+    @Body() updateUserRequestDto: UpdateUserRequestDto,
+  ) {
     const command = new UpdateUserCommandDto(
       updateUserRequestDto.email,
       updateUserRequestDto.password,
       updateUserRequestDto.name,
-      updateUserRequestDto.role
+      updateUserRequestDto.role,
     );
     return this.usersService.updateUser(id, command);
   }
@@ -52,10 +63,11 @@ export class UsersController {
   @Delete(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
-  deleteUser(@Param('id') id: string, deletUserRequestDto: DeleteUserRequestDto) {
+  deleteUser(
+    @Param('id') id: string,
+    deletUserRequestDto: DeleteUserRequestDto,
+  ) {
     const command = new DeleteUserCommandDto(id);
     return this.usersService.deleteUser(id, command);
   }
-
-
 }

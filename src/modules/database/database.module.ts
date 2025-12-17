@@ -12,7 +12,9 @@ import { ConfigService } from '@nestjs/config';
         const key = config.get<string>('SUPABASE_KEY');
 
         if (!url || !key) {
-          throw new Error('Missing Supabase URL or KEY in environment variables');
+          throw new Error(
+            'Missing Supabase URL or KEY in environment variables',
+          );
         }
 
         return createClient(url, key);

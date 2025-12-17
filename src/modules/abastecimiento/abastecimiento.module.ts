@@ -1,29 +1,40 @@
 import { Module } from '@nestjs/common';
 import { DatabaseModule } from '../database/database.module';
-import {SupabaseComprasRepository} from './purchase/infrastructure/supabase.compras.repository'; 
-import {PurchaseService} from './purchase/service/purchase.service';
-import {PurchaseController} from './purchase/presentation/purchase.controller';
+import { SupabaseComprasRepository } from './purchase/infrastructure/supabase.compras.repository';
+import { SupbasePurchaseDetailsRepository } from './purchase/infrastructure/supabase.purchase_details.repository';
+import { PurchaseService } from './purchase/service/purchase.service';
+// TODO: Uncomment when PurchaseController is implemented
+// import {PurchaseController} from './purchase/presentation/purchase.controller';
 
-import {SupabaseSupplierRepository} from './suppliers/infrastructure/supabase.supplier.repository';
-import {SupplierService} from './suppliers/service/supplier.service';
-import {SupplierController} from './suppliers/presentation/supplier.controller';
-
+// TODO: Uncomment when Supplier module is implemented
+// import {SupabaseSupplierRepository} from './suppliers/infrastructure/supabase.supplier.repository';
+// import {SupplierService} from './suppliers/service/supplier.service';
+// import {SupplierController} from './suppliers/presentation/supplier.controller';
 
 @Module({
   imports: [DatabaseModule],
-  controllers: [PurchaseController, SupplierController],
+  controllers: [
+    // TODO: Uncomment when controllers are implemented
+    // PurchaseController,
+    // SupplierController
+  ],
   providers: [
     PurchaseService,
-    SupplierService,
+    // TODO: Uncomment when SupplierService is implemented
+    // SupplierService,
     {
       provide: 'PurchaseRepository',
       useClass: SupabaseComprasRepository,
     },
     {
-      provide: 'SupplierRepository',
-      useClass: SupabaseSupplierRepository,
+      provide: 'PurchaseDetailsRepository',
+      useClass: SupbasePurchaseDetailsRepository,
     },
+    // TODO: Uncomment when SupplierRepository is implemented
+    // {
+    //   provide: 'SupplierRepository',
+    //   useClass: SupabaseSupplierRepository,
+    // },
   ],
 })
-export class AbastecimientoModule { }
-
+export class AbastecimientoModule {}

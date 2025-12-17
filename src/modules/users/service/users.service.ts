@@ -8,8 +8,9 @@ import DeleteUserCommandDto from './dto/DeleteUserCommand.dto';
 
 @Injectable()
 export class UsersService {
-
-  constructor(@Inject('UserRepository') private readonly usersRepository: UserRepository) { }
+  constructor(
+    @Inject('UserRepository') private readonly usersRepository: UserRepository,
+  ) {}
 
   createUser(dto: CreateUserCommandDto) {
     const user = new User(
@@ -41,7 +42,7 @@ export class UsersService {
     return this.usersRepository.updateUser(id, user);
   }
 
-  async deleteUser( id: string, deleteDto: DeleteUserCommandDto){
+  async deleteUser(id: string, deleteDto: DeleteUserCommandDto) {
     return this.usersRepository.deleteUser(id, deleteDto);
   }
 }

@@ -5,6 +5,5 @@ import { FondosController } from './fondos.controller';
 @Module({
   controllers: [FondosController],
   providers: [FondosService],
-  
 })
 export class FondosModule {}
