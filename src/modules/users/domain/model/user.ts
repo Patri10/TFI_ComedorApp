@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 export enum UserRole {
     ADMIN = 'admin',
     ECONOMA = 'economa',
@@ -26,6 +27,26 @@ export default class User {
     }
 
     public getEmail(): string  {
+=======
+export default class {
+    public constructor(
+        private readonly name: string,
+        private readonly lastName: string,
+        private readonly email: string,
+        private readonly password: string,
+        private readonly role: string,
+    ) { }
+
+    public getName(): string {
+        return this.name;
+    }
+
+    public getLastName(): string {
+        return this.lastName;
+    }
+
+    public getEmail(): string {
+>>>>>>> 035c6589be53597a6257f07c2b2fe26c0f2e21c9
         return this.email;
     }
 
@@ -33,6 +54,7 @@ export default class User {
         return this.password;
     }
 
+<<<<<<< HEAD
 
     public getNombre(): string | undefined {
         return this.nombre;
@@ -44,5 +66,9 @@ export default class User {
 
     public getUuid(): string | undefined {
         return this.uuid;
+=======
+    public getRole(): string {
+        return this.role;
+>>>>>>> 035c6589be53597a6257f07c2b2fe26c0f2e21c9
     }
 }

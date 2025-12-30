@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
-import { FondosService } from './fondos.service';
-import { FondosController } from './fondos.controller';
+import { FondosService } from './service/fondos.service';
+import { FondosController } from './presentation/fondos.controller';
 
 @Module({
   controllers: [FondosController],
   providers: [FondosService],
   
 })
-export class FondosModule {}
+export class FondosModule { }

@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { FacturasController } from './facturas.controller';
-import { FacturasService } from './facturas.service';
+import { FacturasService } from './service/facturas.service';
 
 describe('FacturasController', () => {
   let controller: FacturasController;

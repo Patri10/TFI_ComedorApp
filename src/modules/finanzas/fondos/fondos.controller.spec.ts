@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { FondosController } from './fondos.controller';
-import { FondosService } from './fondos.service';
+import { FondosService } from './service/fondos.service';
 
 describe('FondosController', () => {
   let controller: FondosController;
