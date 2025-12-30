@@ -17,7 +17,11 @@ export class PurchaseService {
         private readonly purchaseDetailsRepository: PurchaseDetailsRepository,
     ) { }
 
+<<<<<<< Updated upstream
     // Métodos de Purchase
+=======
+    
+>>>>>>> Stashed changes
     async createPurchase(purchase: Purchase): Promise<Purchase> {
         return await this.purchaseRepository.createPurchase(purchase);
     }
@@ -34,6 +38,7 @@ export class PurchaseService {
         await this.purchaseRepository.deletePurchase(id);
     }
 
+<<<<<<< Updated upstream
     // Métodos de PurchaseDetails
     async createPurchaseDetail(purchaseDetail: PurchaseDetail): Promise<PurchaseDetail> {
         return await this.purchaseDetailsRepository.createPurchaseDetail(purchaseDetail);
@@ -62,4 +67,11 @@ export class PurchaseService {
         await this.findPurchaseDetailById(id);
         await this.purchaseDetailsRepository.deletePurchaseDetail(id);
     }
+=======
+    
+
+   
+
+  
+>>>>>>> Stashed changes
 }

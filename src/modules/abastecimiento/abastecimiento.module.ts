@@ -1,9 +1,14 @@
 import { Module } from '@nestjs/common';
 
+<<<<<<< Updated upstream
 // Proveedores
 import { ProveedoresController } from './presentation/proveedores/controllers/proveedores.controller';
 import { ProveedoresService } from './application/proveedores/services/proveedor.service';
 import { ProveedorRepositoryImpl } from './infrastructure/proveedores/repositories/proveedor.repository';
+=======
+import {SupabaseSupplierRepository} from './suppliers/infrastructure/supabase.supplier.repository';
+
+>>>>>>> Stashed changes
 
 // Compras
 import { ComprasController } from './presentation/compras/controllers/compras.controller';
@@ -16,6 +21,7 @@ import { DetalleCompraService } from './application/detalle_compra/services/deta
 import { DetalleCompraController } from './presentation/detalle_compra/controllers/detalle_compra.controller';
 
 @Module({
+<<<<<<< Updated upstream
     controllers: [ProveedoresController, ComprasController, DetalleCompraController],
     providers: [
         // Servicios
@@ -29,5 +35,21 @@ import { DetalleCompraController } from './presentation/detalle_compra/controlle
         { provide: 'DetalleCompraRepository', useClass: DetalleCompraRepositoryImpl },
     ],
     exports: [ProveedoresService, ComprasService, DetalleCompraService],
+=======
+  imports: [DatabaseModule],
+  controllers: [PurchaseController],
+  providers: [
+    PurchaseService,
+    
+    {
+      provide: 'PurchaseRepository',
+      useClass: SupabaseComprasRepository,
+    },
+    {
+      provide: 'SupplierRepository',
+      useClass: SupabaseSupplierRepository,
+    },
+  ],
+>>>>>>> Stashed changes
 })
 export class AbastecimientoModule { }

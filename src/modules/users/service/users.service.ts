@@ -19,7 +19,7 @@ export class UsersService {
       randomUUID(),
       undefined,
       dto.getNombre(),
-      dto.getRol() as UserRole,
+      dto.getRol() as UserRole, 
     );
     return this.usersRepository.createUser(user);
   }

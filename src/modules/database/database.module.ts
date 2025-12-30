@@ -17,9 +17,32 @@ import { ConfigService, ConfigModule } from '@nestjs/config';
         }
 
         return createClient(url, key);
+<<<<<<< Updated upstream
       }
     }
+=======
+      },
+    },
+    {
+      provide: 'SUPABASE_ADMIN_CLIENT',
+      inject: [ConfigService],
+      useFactory: (config: ConfigService): SupabaseClient => {
+        const url = config.get<string>('SUPABASE_URL');
+        const adminKey = config.get<string>('SUPABASE_SERVICE_ROLE_KEY');
+
+        if (!url || !adminKey) {
+          throw new Error('Missing Supabase URL or SERVICE_ROLE_KEY in environment variables');
+        }
+
+        return createClient(url, adminKey);
+      },
+    },
+>>>>>>> Stashed changes
   ],
-  exports: ['SUPABASE_CLIENT'],
+  exports: ['SUPABASE_CLIENT', 'SUPABASE_ADMIN_CLIENT'],
 })
+<<<<<<< Updated upstream
 export class SupabaseModule { }
+=======
+export class DatabaseModule { }
+>>>>>>> Stashed changes

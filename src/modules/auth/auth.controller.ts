@@ -20,6 +20,19 @@ export class AuthController {
             throw new UnauthorizedException(error.message);
         }
 
-        return data;
+        const session = data.session;
+
+        if (!session?.access_token) {
+            throw new UnauthorizedException('No se recibió token de autenticación.');
+        }
+
+        return {
+            token: session.access_token, // alias esperado por el frontend
+            access_token: session.access_token,
+            refresh_token: session.refresh_token,
+            expires_at: session.expires_at,
+            token_type: session.token_type,
+            user: data.user,
+        };
     }
 }
