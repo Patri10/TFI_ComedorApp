@@ -12,7 +12,9 @@ export class PurchaseController {
 
   @Post()
   createPurchase(@Body() createPurchaseRequestDto: CreatePurchaseRequestDto) {
-    // Convert purchase_details from the request into PurchaseDetail objects
+    // TODO: The CreatePurchaseRequestDto.purchase_details is currently typed as number[]
+    // but should be an array of objects with {food_id, quantity, unit_price, purchase_id}
+    // For now, passing empty array until the DTO is fixed
     const purchaseDetails: PurchaseDetail[] = [];
     
     const command = new CreatePurchaseCommandDto(
@@ -40,7 +42,7 @@ export class PurchaseController {
       updatePurchaseRequestDto.total_amount,
       updatePurchaseRequestDto.invoice_number
     );
-    return this.purchaseService.updatePurchase(id, command);
+    return this.purchaseService.updatePurchase(command);
   }
 
   @Delete(':id')

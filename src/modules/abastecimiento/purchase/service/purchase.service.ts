@@ -27,7 +27,7 @@ export class PurchaseService {
         return this.purchaseRepository.findAllPurchases();
     }
 
-    async updatePurchase(id: string, dto: UpdatePurchaseCommandDto): Promise<Purchase> {
+    async updatePurchase(dto: UpdatePurchaseCommandDto): Promise<Purchase> {
         return this.purchaseRepository.updatePurchase(dto);
     }
 
