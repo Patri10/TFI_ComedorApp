@@ -3,9 +3,10 @@ import { SupabaseUserRepository } from './infrastructure/supabase.user.repositor
 import { UsersService } from './service/users.service';
 import { UsersController } from './presentation/users.controller';
 import { DatabaseModule } from '../database/database.module';
+import { AuthModule } from '../auth/auth.module';
 
 @Module({
-  imports: [DatabaseModule],
+  imports: [DatabaseModule, AuthModule],
   controllers: [UsersController],
   providers: [
     UsersService,

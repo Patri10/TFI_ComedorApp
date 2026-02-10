@@ -5,5 +5,5 @@ export interface PurchaseDetailsRepository {
     findPurchaseDetailById(id: string): Promise<PurchaseDetail | null>;
     findAllPurchaseDetails(): Promise<PurchaseDetail[]>;
     updatePurchaseDetail(purchaseDetail: PurchaseDetail): Promise<PurchaseDetail>;
-    deletePurchaseDetail(id: string): Promise<void>;
+    deletePurchaseId(purchase_id: string): Promise<void>;
 }

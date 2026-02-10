@@ -1,5 +1,20 @@
-import { IsNotEmpty, IsString, IsDate, IsNumber, IsOptional } from "class-validator";
+import { IsNotEmpty, IsString, IsDate, IsNumber, IsOptional, IsArray, ValidateNested, } from "class-validator";
+import { Type } from 'class-transformer';
 
+
+export class UpdatePurchaseDetailRequestDto {
+    @IsOptional()
+    @IsString()
+    food_id?: string;
+
+    @IsOptional()
+    @IsNumber()
+    quantity?: number;
+
+    @IsOptional()
+    @IsNumber()
+    unit_price?: number;
+}
 export default class UpdatePurchaseRequestDto {
     @IsOptional()
     @IsString()
@@ -20,4 +35,10 @@ export default class UpdatePurchaseRequestDto {
     @IsOptional()
     @IsString()
     invoice_number: string;
+
+    @IsOptional()
+    @IsArray()
+    @ValidateNested({ each: true })
+    @Type(() => UpdatePurchaseDetailRequestDto)
+    purchase_details?: UpdatePurchaseDetailRequestDto[];
 }

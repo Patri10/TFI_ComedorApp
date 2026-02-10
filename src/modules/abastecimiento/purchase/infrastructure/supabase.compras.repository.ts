@@ -16,7 +16,7 @@ export class SupabaseComprasRepository implements PurchaseRepository {
     ) { }
 
     async createPurchase(purchase: Purchase): Promise<Purchase> {
-        
+
         const { data: purchaseData, error: purchaseError } = await this.supabaseClient
             .from('purchases')
             .insert({
@@ -36,14 +36,14 @@ export class SupabaseComprasRepository implements PurchaseRepository {
         const newPurchaseId = purchaseData.id;
 
         const { data: exists, error: existError } = await this.supabaseClient
-        .from('purchases')
-        .select('id')
-        .eq('id', newPurchaseId)
-        .single();
+            .from('purchases')
+            .select('id')
+            .eq('id', newPurchaseId)
+            .maybeSingle();
 
-    if (existError || !exists) {
-        throw new HttpException('Error de integridad: La compra cabecera no se encuentra para asociar detalles.', HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+        if (existError || !exists) {
+            throw new HttpException('Error de integridad: La compra cabecera no se encuentra para asociar detalles.', HttpStatus.INTERNAL_SERVER_ERROR);
+        }
 
 
         if (purchase.getPurchaseDetails() && purchase.getPurchaseDetails().length > 0) {
@@ -68,51 +68,100 @@ export class SupabaseComprasRepository implements PurchaseRepository {
     }
 
     async findAllPurchases(): Promise<Purchase[]> {
-        const { data, error } = await this.supabaseClient.from('purchases').select('*');
+        // Intentamos traer los detalles también
+        const { data, error } = await this.supabaseClient
+            .from('purchases')
+            .select('*, purchase_details(*)');
+
         if (error) {
-            throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new HttpException("Error al buscar compras: " + error.message, HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-        return data.map((p: any) => new Purchase(
-            p.id,
-            p.supplier_id,
-            p.fund_id,
-            p.date,
-            p.total_amount,
-            p.invoice_number,
-            p.purchase_details
-        ));
+        return data.map((p: any) => this.mapToDomain(p));
     }
 
-    async updatePurchase(purchase: UpdatePurchaseCommandDto): Promise<Purchase> {
+    async findByInvoiceNumber(invoice_number: string): Promise<Purchase | null> {
+        const { data, error } = await this.supabaseClient
+            .from('purchases')
+            .select('*, purchase_details(*)')
+            .eq('invoice_number', invoice_number)
+            .maybeSingle();
+
+        if (error) {
+            throw new HttpException("Error al buscar compra por factura: " + error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        if (!data) {
+            return null;
+        }
+
+        return this.mapToDomain(data);
+    }
+
+    async findById(id: string): Promise<Purchase | null> {
+        const { data, error } = await this.supabaseClient
+            .from('purchases')
+            .select('*, purchase_details(*)')
+            .eq('id', id)
+            .maybeSingle();
+
+        if (error) {
+            throw new HttpException("Error al buscar compra por ID: " + error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        if (!data) {
+            return null;
+        }
+        return this.mapToDomain(data);
+    }
+
+    async updatePurchase(id: string, purchase: Purchase): Promise<Purchase> {
         const { data, error } = await this.supabaseClient.from('purchases').update({
             supplier_id: purchase.getSupplierId(),
             fund_id: purchase.getFundId(),
             date: purchase.getDate(),
             total_amount: purchase.getTotalAmount(),
             invoice_number: purchase.getInvoiceNumber(),
-        }).eq('id', purchase.getId()).select('*').single();
+        }).eq('id', id).select('*').single();
         if (error) {
             throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
+        // Para update, usamos los detalles que ya tenía el objeto purchase o vacíos si no se actualizaron
         return new Purchase(
-            data.id,
             data.supplier_id,
             data.fund_id,
             data.date,
             data.total_amount,
             data.invoice_number,
-            data.purchase_details
+            purchase.getPurchaseDetails(), // Mantener los detalles del objeto original
+            data.id
         );
     }
 
     async deletePurchase(id: string): Promise<void> {
         const { error } = await this.supabaseClient.from('purchases').delete().eq('id', id);
         if (error) {
-            throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new HttpException("Error al eliminar la compra: " + error.message, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-}
-    
 
+    private mapToDomain(data: any): Purchase {
+        const details = data.purchase_details ? data.purchase_details.map((d: any) => new Purchase_details(
+            d.purchase_id,
+            d.food_id,
+            d.quantity,
+            d.unit_price,
+            d.id
+        )) : [];
+
+        return new Purchase(
+            data.supplier_id,
+            data.fund_id,
+            data.date,
+            data.total_amount,
+            data.invoice_number,
+            details,
+            data.id
+        );
+    }
+
+}

@@ -1,44 +1,66 @@
-export default class UpdatePatchPurchaseCommandDto {
+import { PurchaseDetailItemDto } from "./CreatePurchaseCommand.dto";
+
+export default class UpdatePurchaseCommandDto {
     private readonly id: string;
-    private readonly supplier_id: string;
-    private readonly fund_id: string;
-    private readonly date: Date;
-    private readonly total_amount: number;
-    private readonly invoice_number: string;
+    private readonly supplier_id?: string;
+    private readonly fund_id?: string;
+    private readonly invoice_number?: string;
+    private readonly total_amount?: number;
+    private readonly date?: Date;
+    private readonly purchase_details?: PurchaseDetailItemDto[];
 
     constructor(
-        id: string,
-        supplier_id: string,
-        fund_id: string,
-        date: Date,
-        total_amount: number,
-        invoice_number: string
+        supplier_id?: string,
+        fund_id?: string,
+        invoice_number?: string,
+        total_amount?: number,
+        date?: Date,
+        purchase_details?: PurchaseDetailItemDto[]
     ) {
-        this.id = id;
         this.supplier_id = supplier_id;
         this.fund_id = fund_id;
-        this.date = date;
-        this.total_amount = total_amount;
         this.invoice_number = invoice_number;
+        this.total_amount = total_amount;
+        this.date = date;
+        this.purchase_details = purchase_details;
     }
 
-    public getId() {
+    getId(): string {
         return this.id;
     }
-    public getSupplierId() {
+
+    getSupplierId(): string | undefined {
         return this.supplier_id;
     }
-    public getFundId() {
+
+    getFundId(): string | undefined {
         return this.fund_id;
     }
-    public getDate() {
-        return this.date;
+
+    getInvoiceNumber(): string | undefined {
+        return this.invoice_number;
     }
-    public getTotalAmount() {
+
+    getTotalAmount(): number | undefined {
         return this.total_amount;
     }
-    public getInvoiceNumber() {
-        return this.invoice_number;
+    getDate(): Date | undefined {
+        return this.date;
+    }
+    
+    getPurchaseDetails(): PurchaseDetailItemDto[] | undefined {
+        return this.purchase_details;
+    }
+
+    // nuevo total 
+    calculateTotal(): number | undefined {
+        if (!this.purchase_details || this.purchase_details.length === 0) {
+            return undefined;
+        }
+        return this.purchase_details.reduce(
+            (sum, detail) => sum + detail.getSubtotal(),
+            0
+        );
     }
 }
 

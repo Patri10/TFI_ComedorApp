@@ -7,10 +7,10 @@ import User, { UserRole } from '../domain/model/user';
 import DeleteUserCommandDto from './dto/DeleteUserCommand.dto';
 
 @Injectable()
-export class UsersService {
+export class UsersService { 
 
   constructor(@Inject('UserRepository') private readonly usersRepository: UserRepository) { }
-
+ 
   createUser(dto: CreateUserCommandDto) {
     const user = new User(
       new Date(),

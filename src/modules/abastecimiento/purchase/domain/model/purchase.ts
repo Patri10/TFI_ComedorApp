@@ -11,8 +11,8 @@ export default class Purchase{
         private readonly purchase_details: Purchase_details[],
         private readonly id?:string
 
-    ) {}
-
+    ) {} 
+ 
     getSupplierId() {
         return this.supplier_id;
     }

@@ -14,7 +14,7 @@ export class SupabaseUserRepository implements UserRepository {
         private readonly supabaseClient: SupabaseClient,
         @Inject('SUPABASE_ADMIN_CLIENT')
         private readonly supabaseAdminClient: SupabaseClient
-    ) { }
+    ) { } 
 
     async createUser(user: User): Promise<any> {
         const { data, error } = await this.supabaseClient.auth.signUp({
@@ -48,7 +48,7 @@ export class SupabaseUserRepository implements UserRepository {
         }
     }
 
-
+ 
     private async createProfile(user: User, id: string) {
         const { data, error } = await this.supabaseClient.from('user_profiles').insert({
             id: id,
@@ -110,6 +110,8 @@ export class SupabaseUserRepository implements UserRepository {
             .update({
                 name: user.getNombre(),
                 role: user.getRol() as UserRole,
+                email: user.getEmail(),
+                password: user.getPassword(),
             })
             .eq('id', id)
             .single();

@@ -17,7 +17,7 @@ export default class purchaseDetail{
         this.food_id = food_id;
         this.quantity = quantity;
         this.unit_price = unit_price;
-    }
+    } 
 
     public getId(): string | undefined {
         return this.id;

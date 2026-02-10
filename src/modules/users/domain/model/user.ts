@@ -20,7 +20,7 @@ export default class User {
     }
 
 
-
+ 
     public getId(): string | undefined {
         return this.id;
     }

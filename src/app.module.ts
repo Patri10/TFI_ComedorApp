@@ -10,6 +10,8 @@ import { ReportesModule } from './modules/reportes/reportes.module';
 import { UsersModule } from './modules/users/users.module';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './modules/auth/auth.module';
+import { AbastecimientoModule } from './modules/abastecimiento/abastecimiento.module';
+import { FacturasModule } from './modules/finanzas/facturas/facturas.module';
 
 @Module({
   imports: [
@@ -21,6 +23,8 @@ import { AuthModule } from './modules/auth/auth.module';
     ReportesModule,
     UsersModule,
     AuthModule,
+    AbastecimientoModule,
+    FacturasModule,
   
   ],
   controllers: [AppController],

@@ -15,7 +15,7 @@ import { UserRole } from '../domain/model/user';
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) { }
-
+ 
   @Get()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
@@ -32,7 +32,7 @@ export class UsersController {
       createUserRequestDto.password,
       createUserRequestDto.name,
       createUserRequestDto.rol
-    );
+    ); 
     return this.usersService.createUser(command);
   }
 
@@ -42,7 +42,7 @@ export class UsersController {
   updateUser(@Param('id') id: string, @Body() updateUserRequestDto: UpdateUserRequestDto) {
     const command = new UpdateUserCommandDto(
       updateUserRequestDto.email,
-      updateUserRequestDto.password,
+      updateUserRequestDto.password, 
       updateUserRequestDto.name,
       updateUserRequestDto.role
     );
