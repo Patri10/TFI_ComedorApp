@@ -1,17 +1,33 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { AlimentosController } from './alimentos.controller';
-import { AlimentosService } from './alimentos.service';
+import { FoodController } from './presentation/alimentos.controller';
+import { FoodService } from './service/food.service';
+import FoodRepository from './domain/contract/food.repository';
 
-describe('AlimentosController', () => {
-  let controller: AlimentosController;
+describe('FoodController', () => {
+  let controller: FoodController;
+
+  // Mock del FoodRepository
+  const mockFoodRepository: Partial<FoodRepository> = {
+    createFood: jest.fn(),
+    findAll: jest.fn(),
+    findById: jest.fn(),
+    updateFood: jest.fn(),
+    deleteFood: jest.fn(),
+  };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      controllers: [AlimentosController],
-      providers: [AlimentosService],
+      controllers: [FoodController],
+      providers: [
+        FoodService,
+        {
+          provide: 'FoodRepository',
+          useValue: mockFoodRepository,
+        },
+      ],
     }).compile();
 
-    controller = module.get<AlimentosController>(AlimentosController);
+    controller = module.get<FoodController>(FoodController);
   });
 
   it('should be defined', () => {
