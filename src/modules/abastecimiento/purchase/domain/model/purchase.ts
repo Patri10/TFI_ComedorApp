@@ -1,18 +1,16 @@
-import { get } from "http";
 import Purchase_details from "./purchase_details";
 
-export default class Purchase{
+export default class Purchase {
     public constructor(
         private readonly supplier_id: string,
-        private readonly fund_id:string,
+        private readonly fund_id: string,
         private readonly date: Date,
-        private readonly total_amount: number,
-        private readonly invoice_number: string,
+        private readonly total_amount: number | null,
         private readonly purchase_details: Purchase_details[],
-        private readonly id?:string
+        private readonly status: string,
+        private readonly id?: string,
+    ) { }
 
-    ) {} 
- 
     getSupplierId() {
         return this.supplier_id;
     }
@@ -25,8 +23,8 @@ export default class Purchase{
     getTotalAmount() {
         return this.total_amount;
     }
-    getInvoiceNumber() {
-        return this.invoice_number;
+    getStatus(): string {
+        return this.status;
     }
     getPurchaseDetails() {
         return this.purchase_details;

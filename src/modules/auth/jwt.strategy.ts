@@ -7,22 +7,31 @@ import { ConfigService } from '@nestjs/config';
 export class JwtStrategy extends PassportStrategy(Strategy) {
     constructor(private readonly configService: ConfigService) {
         const secret = configService.get<string>('SUPABASE_JWT_SECRET');
-        console.log('JwtStrategy initialized. Secret length:', secret ? secret.length : 0);
-        if (!secret) console.warn('WARNING: SUPABASE_JWT_SECRET is missing!');
+
+        if (!secret) {
+            throw new Error(
+                '❌ SUPABASE_JWT_SECRET no está configurado. ' +
+                'Agregá esta variable de entorno antes de iniciar el servidor.'
+            );
+        }
 
         super({
             jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
             ignoreExpiration: false,
-            secretOrKey: secret || 'fallback_secret_to_avoid_crash_but_will_fail_auth',
+            secretOrKey: secret,
         });
     }
 
     async validate(payload: any) {
-        console.log('JWT Payload:', payload);
+        // En Supabase, el rol real del usuario está en app_metadata.role
+        // payload.role siempre es 'authenticated', no el rol de la app
+        const appRole = payload.app_metadata?.role
+            ?? payload.user_metadata?.role
+            ?? payload.role;
         return {
             userId: payload.sub,
             email: payload.email,
-            role: payload.role, // Ojo: este suele ser 'authenticated' en Supabase
+            role: appRole,
             app_metadata: payload.app_metadata,
             user_metadata: payload.user_metadata
         };

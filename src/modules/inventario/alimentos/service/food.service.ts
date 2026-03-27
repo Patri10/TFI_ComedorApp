@@ -4,6 +4,7 @@ import { UpdateFoodCommandDto } from './dto/UpdateFoodCommand.dto';
 import DeleteFoodCommandDto from './dto/DeleteFoodCommand.dto';
 import Food from '../domain/model/food';
 import type { FoodRepository } from '../domain/contract/food.repository';
+import { FoodCategory } from '../domain/model/food-category.enum';
 
 export interface FoodWithStatus {
   id?: string;
@@ -14,6 +15,7 @@ export interface FoodWithStatus {
   expiration_date: string;
   status: 'good' | 'low' | 'critical' | 'expiring';
   daysUntilExpiry?: number;
+  min_stock?: number;
 }
 
 @Injectable()
@@ -27,10 +29,32 @@ export class FoodService {
   constructor(@Inject('FoodRepository') private readonly foodRepository: FoodRepository) { }
 
   /**
+   * Obtiene el umbral de stock mínimo recomendado por categoría
+   */
+  private getThresholdForCategory(category: string): number {
+    const thresholds: Record<string, number> = {
+      [FoodCategory.CEREALES]: 2,
+      [FoodCategory.LEGUMBRES]: 2,
+      [FoodCategory.CONDIMENTOS]: 1,
+      [FoodCategory.ACEITES]: 3,
+      [FoodCategory.LACTEOS]: 5,
+      [FoodCategory.CARNES]: 5,
+      [FoodCategory.VERDURAS]: 5,
+      [FoodCategory.FRUTAS]: 5,
+      [FoodCategory.PANADERIA]: 3,
+      [FoodCategory.ENLATADOS]: 5,
+      [FoodCategory.EMBUTIDOS]: 5,
+      [FoodCategory.BEBIDAS]: 4,
+      [FoodCategory.OTROS]: 2,
+    };
+    return thresholds[category] || this.MIN_STOCK_DEFAULT;
+  }
+
+  /**
    * Calcula el estado de un alimento basado en stock y fecha de vencimiento
    */
   private calculateFoodStatus(food: any): 'good' | 'low' | 'critical' | 'expiring' {
-    const minStock = this.MIN_STOCK_DEFAULT;
+    const minStock = this.getThresholdForCategory(food.category);
     const daysUntilExpiry = this.getDaysUntilExpiry(food.expiration_date);
 
     // Prioridad: expiring > critical > low > good
@@ -64,10 +88,12 @@ export class FoodService {
    * Agrega el estado calculado a un alimento
    */
   private enrichFoodWithStatus(food: any): FoodWithStatus {
+    const minStock = this.getThresholdForCategory(food.category);
     return {
       ...food,
       status: this.calculateFoodStatus(food),
-      daysUntilExpiry: this.getDaysUntilExpiry(food.expiration_date)
+      daysUntilExpiry: this.getDaysUntilExpiry(food.expiration_date),
+      min_stock: minStock
     };
   }
 
@@ -124,7 +150,7 @@ export class FoodService {
     }
   }
 
- 
+
   async getLowStockFoods(): Promise<FoodWithStatus[]> {
     try {
       const allFoods = await this.findAll();
@@ -136,7 +162,7 @@ export class FoodService {
     }
   }
 
- 
+
   async getExpiringFoods(): Promise<FoodWithStatus[]> {
     try {
       const allFoods = await this.findAll();
@@ -146,7 +172,7 @@ export class FoodService {
     }
   }
 
- 
+
   async getInventoryStats() {
     try {
       const allFoods = await this.findAll();
@@ -164,15 +190,6 @@ export class FoodService {
   }
 
   async findCategory(category: string): Promise<FoodWithStatus[]> {
-    try {
-      const allFoods = await this.findAll();
-      return allFoods.filter(food => food.category === category);
-    } catch (error) { 
-      throw error;
-    }
-  }
-
-  async getCategory(category: string): Promise<any[]> {
     try {
       const allFoods = await this.findAll();
       return allFoods.filter(food => food.category === category);

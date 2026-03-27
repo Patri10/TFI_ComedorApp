@@ -9,7 +9,6 @@ import { CreatePurchaseCommandDto, PurchaseDetailItemDto } from '../service/dto/
 import UpdatePurchaseRequestDto from './dto/UpdatePurchaseRequest.dto';
 import UpdatePurchaseCommandDto from '../service/dto/UpdatePurchaseCommand.dto';
 import DeletePurchaseCommandDto from '../service/dto/DeletePurchaseCommand.dto';
-import DeletePurchaseRequestDto from './dto/DeletePurchaseRequest.dto';
 
 @Controller('compras')
 export class PurchaseController {
@@ -29,13 +28,15 @@ export class PurchaseController {
         const details = createPurchaseRequestDto.purchase_details.map(
             (detail) =>
                 new PurchaseDetailItemDto(
-                    detail.food_id,
+                    detail.food_name,
                     detail.quantity,
                     detail.unit_price,
+                    detail.category,
+                    detail.unit,
+                    detail.expiration_date
                 ),
         );
 
-        // Calcular el total_amount sumando los subtotales de los detalles
         const totalAmount = details.reduce(
             (sum, detail) => sum + detail.getSubtotal(),
             0,
@@ -45,7 +46,6 @@ export class PurchaseController {
             createPurchaseRequestDto.supplier_id,
             createPurchaseRequestDto.fund_id,
             totalAmount,
-            createPurchaseRequestDto.invoice_number,
             details,
         );
 
@@ -80,25 +80,20 @@ export class PurchaseController {
         const command = new UpdatePurchaseCommandDto(
             updatePurchaseRequestDto.supplier_id,
             updatePurchaseRequestDto.fund_id,
-            updatePurchaseRequestDto.invoice_number,
             updatePurchaseRequestDto.total_amount,
             updatePurchaseRequestDto.date,
             details,
+            updatePurchaseRequestDto.status,
         );
 
-        // Extraer el rol del usuario desde el request (inyectado por JwtAuthGuard/Passport)
         const userRole = req.user?.role as UserRole;
-
         return this.purchaseService.updatePurchase(id, command, userRole);
     }
 
     @Delete(':id')
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles(UserRole.ADMIN, UserRole.ECONOMA, UserRole.DIRECTORA)
-    deletePurchase(
-        @Param('id') id: string,
-        @Body() deletePurchaseRequestDto: DeletePurchaseRequestDto,
-    ) {
+    deletePurchase(@Param('id') id: string) {
         const command = new DeletePurchaseCommandDto(id);
         return this.purchaseService.deletePurchase(command);
     }

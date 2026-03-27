@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
-import { FondosService } from './fondos.service';
-import { FondosController } from './fondos.controller';
+import { FondosService } from './service/fondos.service';
+import { FondosController } from './presentation/fondos.controller';
 import { DatabaseModule } from 'src/modules/database/database.module';
 import { SupabaseFundRepository } from './infrastructure/supabase.fund.repository';
 

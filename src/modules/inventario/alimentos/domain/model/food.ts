@@ -49,9 +49,6 @@ export default class Food {
     }
 
     public getExpirationDate(): Date | undefined {
-        if (this.expiration_date && this.expiration_date < new Date()) {
-            throw new Error("Fecha de expiración no puede ser menor a la fecha actual");
-        }
         return this.expiration_date;
     }
 }

@@ -1,5 +1,5 @@
 
 export enum FundType {
-    GENERAL = 'GENERAL',
-    NUTRICION = 'NUTRICION'
+    GENERAL = 'general',
+    NUTRICION = 'nutrition'
 }

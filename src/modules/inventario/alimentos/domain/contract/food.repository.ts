@@ -4,6 +4,7 @@ export interface FoodRepository {
     createFood(food: Food): Promise<any>;
     findAll(): Promise<any[]>;
     findById(id: string): Promise<any | null>;
+    findByName(name: string): Promise<any | null>;
     updateFood(id: string, food: Food): Promise<any>;
     deleteFood(id: string): Promise<void>;
     stockAlert(): Promise<any[]>;

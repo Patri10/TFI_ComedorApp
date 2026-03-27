@@ -1,5 +1,7 @@
-import { Controller, Post, Body, UnauthorizedException, Inject } from '@nestjs/common';
+import { Controller, Post, Get, Body, UnauthorizedException, Inject, Req } from '@nestjs/common';
 import { SupabaseClient } from '@supabase/supabase-js';
+import { Public } from './public.decorator';
+import type { Request } from 'express';
 
 @Controller('auth')
 export class AuthController {
@@ -8,10 +10,9 @@ export class AuthController {
         private readonly supabaseClient: SupabaseClient,
     ) { }
 
+    @Public()
     @Post('login')
-    async login(@Body() body: any) {
-        console.log('🔐 Login attempt:', { email: body.email });
-
+    async login(@Body() body: { email: string; password: string }) {
         const { email, password } = body;
 
         const { data, error } = await this.supabaseClient.auth.signInWithPassword({
@@ -20,15 +21,18 @@ export class AuthController {
         });
 
         if (error) {
-            console.error('❌ Login error:', error.message);
             throw new UnauthorizedException(error.message);
         }
 
-        console.log('✅ Login successful:', {
-            userId: data.user?.id,
-            email: data.user?.email
-        });
-
         return data;
+    }
+
+    /**
+     * Retorna los datos del usuario autenticado decodificados desde el JWT.
+     * El frontend debe usar este endpoint en lugar de leer el rol desde localStorage.
+     */
+    @Get('me')
+    getMe(@Req() req: Request) {
+        return (req as any).user;
     }
 }
