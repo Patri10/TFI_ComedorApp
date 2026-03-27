@@ -165,6 +165,27 @@ export class SupabaseFundRepository implements FundRepository {
         return this.mapToDomain(data);
     }
 
+    async updateInitialAndRemainingAmount(id: string, newInitial: number, newRemaining: number): Promise<Fund> {
+        const { data, error } = await this.supabaseClient
+            .from('funds')
+            .update({
+                initial_amount: newInitial,
+                remaining_amount: newRemaining,
+            })
+            .eq('id', id)
+            .select()
+            .single();
+
+        if (error) {
+            throw new HttpException(
+                'Error al recargar el fondo: ' + error.message,
+                HttpStatus.BAD_REQUEST,
+            );
+        }
+
+        return this.mapToDomain(data);
+    }
+
     private mapToDomain(data: any): Fund {
         return new Fund(
             data.month,

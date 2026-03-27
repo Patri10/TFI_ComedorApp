@@ -14,6 +14,9 @@ import { DatabaseModule } from '../../database/database.module';
       useClass: SupabaseFoodRepository,
     },
   ],
-  exports: [FoodService],
+  exports: [
+    FoodService,
+    'FoodRepository' // Exportar para que otros módulos puedan inyectarlo
+  ],
 })
 export class AlimentosModule { }

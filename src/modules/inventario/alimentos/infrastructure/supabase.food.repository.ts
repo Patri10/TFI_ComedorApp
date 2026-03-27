@@ -12,13 +12,25 @@ export class SupabaseFoodRepository implements FoodRepository {
     ) { }
 
     async createFood(food: Food): Promise<Food> {
-        const { data, error } = await this.supabase.from('foods').insert({
+        const expirationDate = food.getExpirationDate();
+        const foodData: any = {
             name: food.getName(),
             category: food.getCategory(),
             unit: food.getUnit(),
-            stock: food.getStock(),
-            expiration_date: food.getExpirationDate()
-        }).select().single();
+            stock: food.getStock()
+        };
+
+        // Solo incluir expiration_date si tiene un valor
+        if (expirationDate) {
+            foodData.expiration_date = expirationDate;
+        }
+
+        const { data, error } = await this.supabase
+            .from('foods')
+            .insert(foodData)
+            .select()
+            .single();
+
         if (error) {
             throw error;
         }
@@ -42,14 +54,40 @@ export class SupabaseFoodRepository implements FoodRepository {
         return data;
     }
 
+    async findByName(name: string): Promise<Food | null> {
+        const { data, error } = await this.supabase
+            .from('foods')
+            .select('*')
+            .ilike('name', name)
+            .maybeSingle();
+
+        if (error) {
+            throw error;
+        }
+        return data;
+    }
+
     async updateFood(id: string, food: Food): Promise<Food> {
-        const { data, error } = await this.supabase.from('foods').update({
+        const expirationDate = food.getExpirationDate();
+        const foodData: any = {
             name: food.getName(),
             category: food.getCategory(),
             unit: food.getUnit(),
-            stock: food.getStock(),
-            expiration_date: food.getExpirationDate()
-        }).eq('id', id).select().single();
+            stock: food.getStock()
+        };
+
+        // Solo incluir expiration_date si tiene un valor
+        if (expirationDate) {
+            foodData.expiration_date = expirationDate;
+        }
+
+        const { data, error } = await this.supabase
+            .from('foods')
+            .update(foodData)
+            .eq('id', id)
+            .select()
+            .single();
+
         if (error) {
             throw error;
         }

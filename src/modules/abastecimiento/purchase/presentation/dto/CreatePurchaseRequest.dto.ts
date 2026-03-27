@@ -1,11 +1,10 @@
 import { Type } from "class-transformer";
-import { IsNotEmpty, IsString, IsNumber, IsArray, ValidateNested } from "class-validator";
+import { IsNotEmpty, IsString, IsNumber, IsArray, ValidateNested, IsOptional } from "class-validator";
 
-// DTO para cada detalle/item de la compra
 export class CreatePurchaseDetailRequestDto {
     @IsNotEmpty()
     @IsString()
-    food_id: string;
+    food_name: string;
 
     @IsNotEmpty()
     @IsNumber()
@@ -14,9 +13,20 @@ export class CreatePurchaseDetailRequestDto {
     @IsNotEmpty()
     @IsNumber()
     unit_price: number;
+
+    @IsOptional()
+    @IsString()
+    category?: string;
+
+    @IsOptional()
+    @IsString()
+    unit?: string;
+
+    @IsOptional()
+    @IsString()
+    expiration_date?: string;
 }
 
-// DTO principal para crear una compra
 export class CreatePurchaseRequestDto {
     @IsNotEmpty()
     @IsString()
@@ -26,13 +36,8 @@ export class CreatePurchaseRequestDto {
     @IsString()
     fund_id: string;
 
-    @IsNotEmpty()
-    @IsString()
-    invoice_number: string;
-
     @IsArray()
     @ValidateNested({ each: true })
     @Type(() => CreatePurchaseDetailRequestDto)
     purchase_details: CreatePurchaseDetailRequestDto[];
 }
-

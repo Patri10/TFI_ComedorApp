@@ -10,4 +10,5 @@ export interface FundRepository {
     updateFund(id: string, fund: Fund): Promise<Fund>;
     deleteFund(id: string): Promise<void>;
     updateRemainingAmount(id: string, newAmount: number): Promise<Fund>;
+    updateInitialAndRemainingAmount(id: string, newInitial: number, newRemaining: number): Promise<Fund>;
 }

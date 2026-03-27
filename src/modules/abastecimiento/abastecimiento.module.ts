@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { DatabaseModule } from '../database/database.module';
 import { FondosModule } from '../finanzas/fondos/fondos.module';
+import { AlimentosModule } from '../inventario/alimentos/alimentos.module';
 import { SupabaseComprasRepository } from './purchase/infrastructure/supabase.compras.repository';
 import { PurchaseService } from './purchase/service/purchase.service';
 import { PurchaseController } from '../abastecimiento/purchase/presentation/purchase.controller';
@@ -10,7 +11,7 @@ import { SupplierController } from './suppliers/presentation/supplier.controller
 
 
 @Module({
-  imports: [DatabaseModule, FondosModule],
+  imports: [DatabaseModule, FondosModule, AlimentosModule],
   controllers: [PurchaseController, SupplierController],
   providers: [
     PurchaseService,

@@ -1,6 +1,5 @@
-import { IsNotEmpty, IsString, IsDate, IsNumber, IsOptional, IsArray, ValidateNested, } from "class-validator";
+import { IsNotEmpty, IsString, IsDate, IsNumber, IsOptional, IsArray, ValidateNested } from "class-validator";
 import { Type } from 'class-transformer';
-
 
 export class UpdatePurchaseDetailRequestDto {
     @IsOptional()
@@ -15,26 +14,27 @@ export class UpdatePurchaseDetailRequestDto {
     @IsNumber()
     unit_price?: number;
 }
+
 export default class UpdatePurchaseRequestDto {
     @IsOptional()
     @IsString()
-    supplier_id: string;
+    supplier_id?: string;
 
     @IsOptional()
     @IsString()
-    fund_id: string;
+    fund_id?: string;
 
     @IsOptional()
     @IsDate()
-    date: Date;
+    date?: Date;
 
     @IsOptional()
     @IsNumber()
-    total_amount: number;
+    total_amount?: number;
 
     @IsOptional()
     @IsString()
-    invoice_number: string;
+    status?: string;
 
     @IsOptional()
     @IsArray()

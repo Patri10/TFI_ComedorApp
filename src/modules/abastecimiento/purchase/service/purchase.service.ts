@@ -1,14 +1,18 @@
 import { Inject, Injectable, NotFoundException, ForbiddenException, BadRequestException } from "@nestjs/common";
 import type { PurchaseRepository } from "../../purchase/domain/contract/purchase.respository";
 import type { SupplierRepository } from '../../suppliers/domain/contract/supplier.respository';
-import { PurchaseDetailsRepository } from "../domain/contract/purchase_details.repository";
+
 import { CreatePurchaseCommandDto } from "../../purchase/service/dto/CreatePurchaseCommand.dto";
 import UpdatePurchaseCommandDto from "../../purchase/service/dto/UpdatePurchaseCommand.dto";
 import Purchase from "../domain/model/purchase";
 import Purchase_details from "../domain/model/purchase_details";
 import { UserRole } from "../../../users/domain/model/user";
 import DeletePurchaseCommandDto from "./dto/DeletePurchaseCommand.dto";
-import { FondosService } from "../../../finanzas/fondos/fondos.service";
+import { FondosService } from "../../../finanzas/fondos/service/fondos.service";
+import type { FoodRepository } from "../../../inventario/alimentos/domain/contract/food.repository";
+import Food from "../../../inventario/alimentos/domain/model/food";
+import { FoodCategory } from "../../../inventario/alimentos/domain/model/food-category.enum";
+import { FoodUnit } from "../../../inventario/alimentos/domain/model/food-unit.enum";
 
 @Injectable()
 export class PurchaseService {
@@ -17,35 +21,71 @@ export class PurchaseService {
         private readonly purchaseRepository: PurchaseRepository,
         @Inject('SupplierRepository')
         private readonly supplierRepository: SupplierRepository,
+        @Inject('FoodRepository')
+        private readonly foodRepository: FoodRepository,
         private readonly fondosService: FondosService
 
     ) { }
 
     async createPurchase(dto: CreatePurchaseCommandDto) {
-        const existingInvoiceNumber = await this.purchaseRepository.findByInvoiceNumber(dto.getInvoiceNumber());
-        if (existingInvoiceNumber) {
-            throw new Error('Ya existe una compra con el mismo número de factura');
-        }
-
-        // Descontar del fondo seleccionado
+        // Descontar del fondo
         await this.fondosService.deductFromFund(dto.getFundId(), dto.getTotalAmount());
 
-        const purchaseDetails = dto.getPurchaseDetails().map(detail =>
-            new Purchase_details(
-                '',
-                detail.getFoodId(),
-                detail.getQuantity(),
-                detail.getUnitPrice()
-            )
+        const purchaseDetails = await Promise.all(
+            dto.getPurchaseDetails().map(async (detail) => {
+
+                const existingFood = await this.foodRepository.findByName(detail.getFoodName());
+
+                let foodId: string;
+
+                if (existingFood) {
+                    const updatedFood = new Food(
+                        existingFood.name,
+                        existingFood.category as FoodCategory,
+                        existingFood.unit as FoodUnit,
+                        existingFood.stock + detail.getQuantity(),
+                        detail.getExpirationDate()
+                            ? new Date(detail.getExpirationDate()!)
+                            : (existingFood.expiration_date ? new Date(existingFood.expiration_date) : undefined),
+                        existingFood.id
+                    );
+                    await this.foodRepository.updateFood(existingFood.id, updatedFood);
+                    foodId = existingFood.id;
+                } else {
+                    const expirationDate = detail.getExpirationDate()
+                        ? new Date(detail.getExpirationDate()!)
+                        : undefined;
+
+                    const newFood = new Food(
+                        detail.getFoodName(),
+                        (detail.getCategory() as FoodCategory) || FoodCategory.OTROS,
+                        (detail.getUnit() as FoodUnit) || FoodUnit.KG,
+                        detail.getQuantity(),
+                        expirationDate
+                    );
+                    const createdFood = await this.foodRepository.createFood(newFood);
+                    foodId = createdFood.id;
+                }
+
+                return new Purchase_details(
+                    '',
+                    foodId,
+                    detail.getQuantity(),
+                    detail.getUnitPrice(),
+                    undefined,
+                    detail.getFoodName()
+                );
+            }),
         );
 
+        // Toda compra nace como 'pendiente' — la factura se carga por separado en /facturas
         const purchase = new Purchase(
             dto.getSupplierId(),
             dto.getFundId(),
             new Date(),
             dto.getTotalAmount(),
-            dto.getInvoiceNumber(),
-            purchaseDetails
+            purchaseDetails,
+            'pendiente'
         );
 
         return this.purchaseRepository.createPurchase(purchase);
@@ -56,17 +96,15 @@ export class PurchaseService {
     }
 
     async updatePurchase(id: string, dto: UpdatePurchaseCommandDto, userRole: UserRole) {
-        // Verificar que la compra existe
+
         const existingPurchase = await this.purchaseRepository.findById(id);
         if (!existingPurchase) {
             throw new NotFoundException(`Compra con ID ${id} no encontrada`);
         }
 
-        // Validación de permisos basada en roles
         if (userRole === UserRole.ECONOMA || userRole === UserRole.DIRECTORA) {
 
             if (dto.getFundId() !== undefined ||
-                dto.getInvoiceNumber() !== undefined ||
                 dto.getTotalAmount() !== undefined ||
                 dto.getDate() !== undefined ||
                 dto.getPurchaseDetails() !== undefined) {
@@ -75,7 +113,6 @@ export class PurchaseService {
                 );
             }
 
-            // Si intentan cambiar el proveedor, validar que existe
             if (dto.getSupplierId() !== undefined) {
                 const supplier = await this.supplierRepository.findSupplierById(dto.getSupplierId());
                 if (!supplier) {
@@ -83,23 +120,21 @@ export class PurchaseService {
                 }
             }
 
-            // Actualizar solo el supplier_id
             const updatedPurchase = new Purchase(
                 dto.getSupplierId() ?? existingPurchase.getSupplierId(),
                 existingPurchase.getFundId(),
                 existingPurchase.getDate(),
                 existingPurchase.getTotalAmount(),
-                existingPurchase.getInvoiceNumber(),
                 existingPurchase.getPurchaseDetails(),
+                existingPurchase.getStatus(),
                 id
             );
 
             return this.purchaseRepository.updatePurchase(id, updatedPurchase);
         }
 
-        // ADMIN puede modificar todo
         if (userRole === UserRole.ADMIN) {
-            // Validar proveedor si se proporciona
+            // Validar proveedor
             const supplierId = dto.getSupplierId();
             if (supplierId !== undefined) {
                 const supplier = await this.supplierRepository.findSupplierById(supplierId);
@@ -108,14 +143,13 @@ export class PurchaseService {
                 }
             }
 
-            // Validar detalles si se proporcionan
+            // Validar detalles
             const purchaseDetailsFromDto = dto.getPurchaseDetails();
             if (purchaseDetailsFromDto !== undefined) {
                 if (purchaseDetailsFromDto.length === 0) {
                     throw new BadRequestException('La compra debe tener al menos un detalle');
                 }
 
-                // Validar que el total calculado coincida con el total proporcionado
                 const totalAmount = dto.getTotalAmount();
                 if (totalAmount !== undefined) {
                     const calculatedTotal = dto.calculateTotal();
@@ -127,16 +161,15 @@ export class PurchaseService {
                 }
             }
 
-            // Crear detalles actualizados si se proporcionan
             const purchaseDetails = purchaseDetailsFromDto !== undefined
-                ? purchaseDetailsFromDto.map(detail =>
-                    new Purchase_details(
-                        '',
-                        detail.getFoodId(),
-                        detail.getQuantity(),
-                        detail.getUnitPrice()
-                    )
-                )
+                ? purchaseDetailsFromDto.map(d => new Purchase_details(
+                    '',
+                    '',
+                    d.getQuantity(),
+                    d.getUnitPrice(),
+                    undefined,
+                    ''
+                ))
                 : existingPurchase.getPurchaseDetails();
 
             const updatedPurchase = new Purchase(
@@ -144,8 +177,8 @@ export class PurchaseService {
                 dto.getFundId() ?? existingPurchase.getFundId(),
                 dto.getDate() ?? existingPurchase.getDate(),
                 dto.getTotalAmount() ?? existingPurchase.getTotalAmount(),
-                dto.getInvoiceNumber() ?? existingPurchase.getInvoiceNumber(),
                 purchaseDetails,
+                dto.getStatus() ?? existingPurchase.getStatus(),
                 id
             );
 
@@ -160,6 +193,13 @@ export class PurchaseService {
         if (!existingPurchase) {
             throw new NotFoundException(`Compra con ID ${deletePurchaseCommandDto.getId()} no encontrada`);
         }
+
+        // Reintegrar el monto al fondo
+        const totalAmount = existingPurchase.getTotalAmount();
+        if (totalAmount && totalAmount > 0) {
+            await this.fondosService.rechargeFund(existingPurchase.getFundId(), totalAmount);
+        }
+
         return this.purchaseRepository.deletePurchase(deletePurchaseCommandDto.getId());
     }
 }

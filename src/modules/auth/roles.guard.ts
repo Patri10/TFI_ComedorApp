@@ -17,11 +17,10 @@ export class RolesGuard implements CanActivate {
         const { user } = context.switchToHttp().getRequest();
         console.log('User in RolesGuard:', user);
 
-        
+
         let userRole = user.role;
 
-        
-        if (!userRole || userRole === 'authenticated' || userRole === 'anon') {            
+        if (!userRole || userRole === 'authenticated' || userRole === 'anon') {
             console.log('Buscando rol real en DB para usuario:', user.userId);
             const { data, error } = await this.supabaseClient
                 .from('user_profiles')
@@ -31,6 +30,8 @@ export class RolesGuard implements CanActivate {
 
             if (data && data.role) {
                 userRole = data.role;
+                // Guardarlo en req.user para que el controlador lo use
+                user.role = userRole;
                 console.log('Rol encontrado en DB:', userRole);
             } else {
                 console.warn('No se pudo obtener rol de DB:', error?.message);
